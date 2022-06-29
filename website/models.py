@@ -1,26 +1,32 @@
-from __main__ import app
-
-db = app.db
+from . import db
 
 
-class Workers(db.Model):
-    __tablename__ = 'names'
+class User(db.Model):
+    __tablename__ = 'user'
+
+    id = db.Column(db.Integer, primary_key=True)
+    acronym = db.Column(db.String(4), unique=True)
+    password = db.Column(db.String(150))
+
+
+class Worker(db.Model):
+    __tablename__ = 'worker'
     __table_args__ = dict(schema='salary')
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
     ru_name = db.Column(db.String(50), unique=True, nullable=False)
     eng_name = db.Column(db.String(50), unique=True, nullable=False)
-    pms = db.relationship('Pms', backref='workers')
-    wages = db.relationship('Wages', backref='workers')
+    pms = db.relationship('Pms', backref='worker')
+    wage = db.relationship('Wage', backref='worker')
 
 
 class Projects(db.Model):
-    __tablename__ = 'projects'
+    __tablename__ = 'project'
     __table_args__ = dict(schema='salary')
 
     id = db.Column(db.Integer, primary_key=True)
     project = db.Column(db.String(6), unique=True, nullable=False)
-    pms = db.relationship('Pms', backref='projects')
+    pms = db.relationship('Pms', backref='project')
 
 
 class Pms(db.Model):
@@ -30,8 +36,8 @@ class Pms(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     week = db.Column(db.Integer, nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('salary.projects.id'))
-    worker_id = db.Column(db.Integer, db.ForeignKey('salary.workers.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('salary.project.id'))
+    worker_id = db.Column(db.Integer, db.ForeignKey('salary.worker.id'))
     func_addon = db.Column(db.String(2))
     work_start = db.Column(db.Time)
     work_end = db.Column(db.Time)
@@ -73,23 +79,23 @@ class PmsSalary(db.Model):
     amount = db.Column(db.Float, nullable=False)
 
 
-class Entities(db.Model):
-    __tablename__ = 'entities'
+class Entity(db.Model):
+    __tablename__ = 'entity'
     __table_args__ = dict(schema='salary')
 
     id = db.Column(db.Integer, primary_key=True)
-    entity = db.Column(db.String(50), unique=True)
-    wages = db.relationship('Wages', backref='entities')
+    entity_name = db.Column(db.String(50), unique=True)
+    wage = db.relationship('Wages', backref='entity')
 
 
-class Wages(db.Model):
-    __tablename__ = 'wages'
+class Wage(db.Model):
+    __tablename__ = 'wage'
     __table_args__ = dict(schema='salary')
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
-    worker_id = db.Column(db.Integer, db.ForeignKey('salary.workers.id'))
-    entity_id = db.Column(db.Integer, db.ForeignKey('salary.entities.id'))
+    worker_id = db.Column(db.Integer, db.ForeignKey('salary.worker.id'))
+    entity_id = db.Column(db.Integer, db.ForeignKey('salary.entity.id'))
     accrual_type = db.Column(db.String(60))
     value = db.Column(db.Float, nullable=False)
 

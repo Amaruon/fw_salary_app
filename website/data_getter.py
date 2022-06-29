@@ -24,8 +24,12 @@ class CsvReader:
     def detect_file(self):
         if list(self.array) in self.template:
             if list(self.array) == self.template[0]:
-                pass
+                return 'pms'
             elif list(self.array) == self.template[1]:
-                pass
+                return 'wages'
         else:
             print('wrong file')
+
+    def process_csv(self, file):
+        self.open_csv(file)
+        self.detect_file()
