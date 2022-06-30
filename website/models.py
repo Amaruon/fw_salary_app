@@ -18,15 +18,17 @@ class Worker(db.Model):
     eng_name = db.Column(db.String(50), unique=True, nullable=False)
     pms = db.relationship('Pms', backref='worker')
     wage = db.relationship('Wage', backref='worker')
+    accrual_1c = db.relationship('Accrual1C', backref='worker')
 
 
-class Projects(db.Model):
+class Project(db.Model):
     __tablename__ = 'project'
     __table_args__ = dict(schema='salary')
 
     id = db.Column(db.Integer, primary_key=True)
     project = db.Column(db.String(6), unique=True, nullable=False)
     pms = db.relationship('Pms', backref='project')
+    accrual_1c = db.relationship('Accrual1C', backref='project')
 
 
 class Pms(db.Model):
@@ -47,8 +49,7 @@ class Pms(db.Model):
     lunch = db.Column(db.Float)
     travelling = db.Column(db.Float)
     transport = db.Column(db.Float)
-    overhr_2 = db.Column(db.Float)
-    overhr_15 = db.Column(db.Float)
+    overhr = db.Column(db.Float)
     holiday = db.Column(db.Float)
     course = db.Column(db.Float)
     paper_work = db.Column(db.Float)
@@ -84,8 +85,20 @@ class Entity(db.Model):
     __table_args__ = dict(schema='salary')
 
     id = db.Column(db.Integer, primary_key=True)
-    entity_name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50), unique=True)
     wage = db.relationship('Wages', backref='entity')
+    accrual_1c = db.relationship('Accrual1C', backref='entity')
+    subdiv = db.relationship('Subdiv', backref='entity')
+
+
+class Subdiv(db.Model):
+    __tablename__ = 'subdiv'
+    __table_args__ = dict(schema='salary')
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    entity_id = db.Column(db.Integer, db.ForeignKey('salary.entity.id'))
+    accrual_1c = db.relationship('Accrual1C', backref='subdiv')
 
 
 class Wage(db.Model):
@@ -100,3 +113,21 @@ class Wage(db.Model):
     value = db.Column(db.Float, nullable=False)
 
     db.UniqueConstraint(date, worker_id, entity_id, accrual_type)
+
+
+class Accrual1C(db.Model):
+    __tablename__ = 'accrual_1c'
+    __table_args__ = dict(schema='salary')
+
+    id = db.Column(db.Ineger, primary_kay=True)
+    month = db.Column(db.Integer)
+    register = db.Column(db.String(150))
+    entity_id = db.Column(db.Integer, db.ForeignKey('salary.entity.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('salary.project.id'))
+    worker_id = db.Column(db.Integer, db.ForeignKey('salary.worker.id'))
+    cost_item = db.Column(db.String(2))
+    subdiv_id = db.Column(db.Integer, db.ForeignKey('salary.subdiv.id'))
+    type = db.Column(db.String(50))
+    group = db.Column(db.String(50))
+
+    db.UniqueConstraint(month, register, )
